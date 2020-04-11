@@ -1,0 +1,57 @@
+.legend {
+  display: flex;
+  flex-direction: row;
+  margin: 20px;
+  & > span:not(:first-child) { border-left: 1px solid $border; }
+  & > span:not(:last-child) { border-right: 1px solid $border; }
+  & > span {
+    display: block;
+    color: $text;
+    font-size: 24px;
+    padding: 5px 10px;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    &.disabled {
+      text-decoration: line-through;
+      color: $disabled;
+    }
+    &:before {
+      content: '';
+      display: block;
+      width: 40px;
+      height: 40px;
+      margin-right: 10px;
+      border: 1px solid $border;
+    }
+    &.visited:before { background: $visited; }
+    &.wall:before { background: $wall; }
+    &.start:before { background: $start; }
+    &.end:before { background: $end; }
+    &.path:before { background: $path; }
+  }
+
+  @media only screen and (max-width: 1023px) {
+    margin: 10px;
+    & > span {
+      font-size: 18px;
+      &:before {
+        width: 25px;
+        height: 25px;
+      }
+    }
+  }
+
+  @media only screen and (max-width: 767px) {
+    margin: 2.5px 5px;
+    & > span {
+      font-size: 16px;
+      &:before {
+        width: 20px;
+        height: 20px;
+      }
+    }
+  }
+}

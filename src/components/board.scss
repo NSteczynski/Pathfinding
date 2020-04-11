@@ -1,0 +1,28 @@
+.board {
+  width: 100%;
+  flex-grow: 1;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  & > .row {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    flex-grow: 1;
+    & > span {
+      width: 100%;
+      height: 100%;
+      border: 1px solid $border;
+      user-select: none;
+      &:hover { cursor: pointer; }
+      &.visited { background: $visited; }
+      &.wall { background: $wall; }
+      &.start { background: $start; transition: none; }
+      &.checkpoint { background: $checkpoint; }
+      &.end { background: $end; transition: none; }
+      &.path { background: $path; }
+    }
+  }
+
+  &.disabled > .row > span:hover { cursor: auto; }
+}

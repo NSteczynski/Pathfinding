@@ -1,0 +1,12 @@
+~*
+/node_modules
+
+#build output
+/bundle*
+/vendor
+/dist
+/build
+
+#IDE
+/.idea
+/.git
