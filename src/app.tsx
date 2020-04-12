@@ -3,6 +3,7 @@ import Header from './components/header'
 import Legend from './components/legend'
 import Board from './components/board'
 import Dijkstra from './core/dijkstra'
+import Timer from './core/timer'
 import { defaultSettings, defaultBoardMouseEvents, AlgorithmInterval } from './core/settings'
 import { Empty, Settings, NodeTypes, Dictionary, NodeParams, BoardMouseEvents, Vector } from './core/types'
 import { getMaxRows, getMaxColumns, getNodeStartPosition, getNodeEndPosition } from './core/functions'
@@ -11,15 +12,18 @@ const App: React.FunctionComponent<Empty> = () => {
   const [settings, setSettings] = React.useState<Settings>(defaultSettings)
   const [nodes, setNodes] = React.useState<Dictionary<NodeParams>>({})
   const [boardMouseEvents, setBoardMouseEvents] = React.useState<BoardMouseEvents>(defaultBoardMouseEvents)
+  const [animationTimers, setAnimationTimers] = React.useState<Array<Timer>>([])
 
   React.useEffect((): () => void => {
     window.addEventListener('resize', onResize)
     window.addEventListener('mousedown', onMouseDown)
     window.addEventListener('mouseup', onMouseUp)
+    clearAnimationTimers()
     return () => {
       window.removeEventListener('resize', onResize)
       window.removeEventListener('mousedown', onMouseDown)
       window.removeEventListener('mouseup', onMouseUp)
+      clearAnimationTimers()
     }
   }, [])
 
@@ -31,23 +35,24 @@ const App: React.FunctionComponent<Empty> = () => {
       for (let y = 0; y < settings.rows; ++y)
         newNodes[`${x}-${y}`] = { type: NodeTypes.UNVISITED, position: { x, y } }
 
-    setSettings(prevState => ({ ...prevState, startNode, endNode, isPlaying: false }))
+    setSettings(prevState => ({ ...prevState, startNode, endNode, isPlaying: false, isPaused: false }))
     setNodes(newNodes)
+    clearAnimationTimers()
   }, [settings.rows, settings.columns])
 
   React.useEffect((): void => {
     if (!settings.isPlaying)
       return undefined
-    const newNodes = clearVisitedAndPathNodes()
-    const [nodeParams, path] = Dijkstra(newNodes, settings.rows, settings.columns, settings.startNode, settings.endNode)
-    const playTime = AlgorithmInterval / settings.playingSpeed
-    for (let i = 0, l = nodeParams.length; i < l; ++i)
-      setTimeout(() => changeNodeType(nodeParams[i].position, nodeParams[i].type), playTime * i)
-    for (let i = 0, l = path.length; i < l; ++i)
-      setTimeout(() => changeNodeType(path[i].position, path[i].type), playTime * (nodeParams.length + i))
-    setTimeout(() => onChange('isPlaying', false), playTime * (nodeParams.length + path.length))
-    setNodes(newNodes)
+    return onPlay()
   }, [settings.isPlaying])
+
+  React.useEffect((): void => {
+    if (!animationTimers.length)
+      return undefined
+    if (!settings.isPaused)
+      return onResume()
+    return onPause()
+  }, [settings.isPaused])
 
   const onResize = (): void => {
     const maxRows = getMaxRows()
@@ -55,16 +60,45 @@ const App: React.FunctionComponent<Empty> = () => {
     setSettings(prevState => ({ ...prevState, rows: maxRows, maxRows, columns: maxColumns, maxColumns }))
   }
 
+  const onPlay = (): void => {
+    const newNodes = clearVisitedAndPathNodes()
+    const [nodeParams, path] = Dijkstra(newNodes, settings.rows, settings.columns, settings.startNode, settings.endNode)
+    const playTime = AlgorithmInterval / settings.playingSpeed
+    const timers: Array<Timer> = []
+    for (let i = 0, l = nodeParams.length; i < l; ++i)
+      timers.push(new Timer(() => changeNodeType(nodeParams[i].position, nodeParams[i].type), playTime * i))
+    for (let i = 0, l = path.length; i < l; ++i)
+      timers.push(new Timer(() => changeNodeType(path[i].position, path[i].type), playTime * (nodeParams.length + i)))
+    timers.push(new Timer(() => onChange('isPlaying', false), playTime * (nodeParams.length + path.length)))
+    setNodes(newNodes)
+    setAnimationTimers(timers)
+  }
+
+  const onPause = (): void => {
+    for (let i = 0, l = animationTimers.length; i < l; ++i)
+      animationTimers[i].pause()
+  }
+
+  const onResume = (): void => {
+    for (let i = 0, l = animationTimers.length; i < l; ++i)
+      animationTimers[i].resume()
+  }
+
+  const onReset = (): void => {
+    const newNodes: Dictionary<NodeParams> = {}
+    for (let x = 0; x < settings.columns; ++x)
+      for (let y = 0; y < settings.rows; ++y)
+        newNodes[`${x}-${y}`] = { type: NodeTypes.UNVISITED, position: { x, y } }
+    setNodes(newNodes)
+    clearAnimationTimers()
+    setSettings(prevState => ({ ...prevState, isPlaying: false, isPaused: false }))
+  }
+
   const onChange = (name: keyof Settings, value: Settings[keyof Settings]): void => setSettings({ ...settings, [name]: value })
   const onMouseUp = (): void => setBoardMouseEvents(prevState => ({ ...prevState, ...defaultBoardMouseEvents }))
   const onMouseDown = (): void => setBoardMouseEvents(prevState => ({ ...prevState, isMouseDown: true }))
   const onStartNode = (): void => setBoardMouseEvents(prevState => ({ ...prevState, isNodeStartDown: true }))
   const onEndNode = (): void => setBoardMouseEvents(prevState => ({ ...prevState, isNodeEndDown: true }))
-
-  const onPathClear = (): void => {
-    const newNodes = clearVisitedAndPathNodes()
-    setNodes(newNodes)
-  }
 
   const onNodeDown = (position: Vector): void => {
     if (settings.isPlaying)
@@ -103,6 +137,12 @@ const App: React.FunctionComponent<Empty> = () => {
     return newNodes
   }
 
+  const clearAnimationTimers = (): void => {
+    for (let i = 0, l = animationTimers.length; i < l; ++i)
+      animationTimers[i].clear()
+    setAnimationTimers([])
+  }
+
   const changeNodeType = (position: Vector, type: NodeTypes): void => {
     const name = `${position.x}-${position.y}`
     if (nodes[name] == undefined)
@@ -118,7 +158,7 @@ const App: React.FunctionComponent<Empty> = () => {
 
   return (
     <React.Fragment>
-      <Header {...settings} onChange={onChange} onPathClear={onPathClear} />
+      <Header {...settings} onChange={onChange} onReset={onReset} />
       <Legend items={NodeTypes} />
       <Board {...settings} nodes={nodes} onStartNode={onStartNode} onEndNode={onEndNode} onNodeDown={onNodeDown} onNodeOver={onNodeOver} />
     </React.Fragment>

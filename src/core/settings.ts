@@ -16,6 +16,7 @@ export const defaultSettings: Settings = {
   endNode: endNodeVector,
   playingSpeed: 1.0,
   isPlaying: false,
+  isPaused: false,
   algorithm: Algorithms.DIJKSTRA
 }
 

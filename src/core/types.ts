@@ -4,6 +4,7 @@ export type Empty =
   | []
   | ""
   | null
+  | undefined
 
 /** The dictionary which uses string as key. */
 export type Dictionary<T> = { [name: string]: T }
@@ -80,13 +81,17 @@ export interface Settings {
   playingSpeed: number
   /** Returns true if visualisation is current playing. */
   isPlaying: boolean
+  /** Return true if visualisation is paused. */
+  isPaused: boolean
   /** The algorithm name. */
   algorithm: Algorithms
 }
 
 /** The dijkstra nodes parameters. */
 export interface DijkstraParams {
+  /** The dijkstra position. */
   position: Vector
+  /** The dijkstra parent. */
   parent?: DijkstraParams
 }
 
