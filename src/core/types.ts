@@ -89,9 +89,11 @@ export interface Settings {
 
 /** The dijkstra nodes parameters. */
 export interface DijkstraParams {
-  /** The dijkstra position. */
+  /** The node position. */
   position: Vector
-  /** The dijkstra parent. */
+  /** The node distance from start. */
+  distance: number
+  /** The node parent. */
   parent?: DijkstraParams
 }
 
