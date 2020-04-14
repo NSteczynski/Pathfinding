@@ -10,7 +10,7 @@ const Header: React.FunctionComponent<Settings & {
   <div className='header'>
     <NumberInput name='rows' label={`Rows (2 - ${maxRows})`} value={rows} min={2} max={maxRows} step={1} disabled={isPlaying} onChange={onChange} />
     <NumberInput name='columns' label={`Columns (4 - ${maxColumns})`} value={columns} min={4} max={maxColumns} step={1} disabled={isPlaying} onChange={onChange} />
-    <NumberInput name='playingSpeed' label='Animation speed (0.5 - 2.0)' value={playingSpeed} min={0.5} max={2.0} step={0.25} disabled={isPlaying} onChange={onChange} />
+    <NumberInput name='playingSpeed' label='Speed (0.5 - 2.0)' value={playingSpeed} min={0.5} max={2.0} step={0.25} disabled={isPlaying} onChange={onChange} />
     <SelectField name='algorithm' label='Algorithm' value={algorithm} options={Algorithms} disabled={isPlaying} onChange={onChange} />
     <button onClick={() => isPlaying ? onChange('isPaused', !isPaused) : onChange('isPlaying', !isPlaying)}>{isPlaying ? isPaused ? 'Resume' : 'Pause' : 'Play'}</button>
     <button onClick={onReset}>Reset</button>

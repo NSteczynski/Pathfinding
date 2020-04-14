@@ -9,10 +9,16 @@ export const Capitalize = (name: string): string => {
 }
 
 /** Returns maximal value of rows that can be presented. */
-export const getMaxRows = (): number => Math.floor(window.innerHeight / 40) < 2 ? 2 : Math.floor(window.innerHeight / 40)
+export const getMaxRows = (): number => {
+  const nodeSize = window.innerWidth <= 768 ? 20 : 40
+  return Math.floor(window.innerHeight / nodeSize) < 2 ? 2 : Math.floor(window.innerHeight / nodeSize)
+}
 
 /** Returns maximal value of columns that can be presented. */
-export const getMaxColumns = (): number => Math.floor(window.innerWidth / 40) < 4 ? 4 : Math.floor(window.innerWidth / 40)
+export const getMaxColumns = (): number => {
+  const nodeSize = window.innerWidth <= 768 ? 20 : 40
+  return Math.floor(window.innerWidth / nodeSize) < 4 ? 4 : Math.floor(window.innerWidth / nodeSize)
+}
 
 /**
  * Returns node start position on middle of rows and on one fourth columns.

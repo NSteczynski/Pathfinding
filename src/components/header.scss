@@ -19,9 +19,29 @@
     &:focus { background: lighten($background, 10%); }
     &:disabled {
       background: transparent;
-      color: $disabledText;
-      border-color: $disabledText;
+      color: $disabled;
+      border-color: $disabled;
       &:hover { cursor: auto; }
+    }
+  }
+  @media only screen and (max-width: 1023px) {
+    padding: 5px;
+    & > button {
+      font-size: 16px;
+      padding: 5px;
+    }
+  }
+  @media only screen and (max-width: 767px) {
+    & > button {
+      font-size: 13px;
+      padding: 2.5px;
+    }
+  }
+  @media only screen and (max-width: 424px) {
+    padding: 5px 0px;
+    & > button {
+      font-size: 11px;
+      margin: 0px 2.5px;
     }
   }
 }
