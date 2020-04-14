@@ -1,4 +1,4 @@
-const WebpackCopyPlugin = require('copy-webpack-plugin')
+const HTMLWebpackPlugin = require('html-webpack-plugin')
 
 module.exports = {
   entry: './src/index.tsx',
@@ -33,8 +33,8 @@ module.exports = {
     open: true
   },
   plugins: [
-    new WebpackCopyPlugin([
-      { from: 'public' }
-    ])
+    new HTMLWebpackPlugin({
+      template: './public/index.html'
+    })
   ],
 }
