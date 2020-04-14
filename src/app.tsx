@@ -41,7 +41,7 @@ const App: React.FunctionComponent<Empty> = () => {
       for (let y = 0; y < settings.rows; ++y)
         newNodes[`${x}-${y}`] = { type: NodeTypes.UNVISITED, position: { x, y } }
 
-    setSettings(prevState => ({ ...prevState, startNode, endNode, isPlaying: false, isPaused: false }))
+    setSettings(prevState => ({ ...prevState, startNode, endNode, isPlaying: false, isPaused: false, isFinished: false }))
     setNodes(newNodes)
     clearAnimationTimers()
   }, [settings.rows, settings.columns])
@@ -71,7 +71,7 @@ const App: React.FunctionComponent<Empty> = () => {
     for (let i = 0, l = path.length; i < l; ++i)
       newNodes[`${path[i].position.x}-${path[i].position.y}`].type = path[i].type
     setNodes(newNodes)
-  }, [settings.startNode, settings.endNode])
+  }, [settings.startNode, settings.endNode, settings.algorithm])
 
   const onResize = (): void => {
     const maxRows = getMaxRows()
