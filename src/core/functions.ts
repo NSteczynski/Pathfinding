@@ -90,25 +90,25 @@ export const getNodeNeighbors = (nodes: Dictionary<NodeParams>, rows: number, co
 
   /** Bottom Right */
   const bottomRightName = `${startNode.position.x + 1}-${startNode.position.y + 1}`
-  const isBottomRight = isBottom && isRight
+  const isBottomRight = isBottom && isRight && (nodes[bottomName].type === NodeTypes.UNVISITED || nodes[rightName].type === NodeTypes.UNVISITED)
   if (isBottomRight && nodes[bottomRightName].type === NodeTypes.UNVISITED)
     neighbors.push({ position: nodes[bottomRightName].position, parent: startNode })
 
   /** Top Left */
   const topLeftName = `${startNode.position.x - 1}-${startNode.position.y - 1}`
-  const isTopLeft = isTop && isLeft
+  const isTopLeft = isTop && isLeft && (nodes[topName].type === NodeTypes.UNVISITED || nodes[leftName].type === NodeTypes.UNVISITED)
   if (isTopLeft && nodes[topLeftName].type === NodeTypes.UNVISITED)
     neighbors.push({ position: nodes[topLeftName].position, parent: startNode })
 
   /** Top Right */
   const topRightName = `${startNode.position.x + 1}-${startNode.position.y - 1}`
-  const isTopRight = isTop && isRight
+  const isTopRight = isTop && isRight && (nodes[topName].type === NodeTypes.UNVISITED || nodes[rightName].type === NodeTypes.UNVISITED)
   if (isTopRight && nodes[topRightName].type === NodeTypes.UNVISITED)
     neighbors.push({ position: nodes[topRightName].position, parent: startNode })
 
   /** Bottom Left */
   const bottomLeftName = `${startNode.position.x - 1}-${startNode.position.y + 1}`
-  const isBottomLeft = isBottom && isLeft
+  const isBottomLeft = isBottom && isLeft && (nodes[bottomName].type === NodeTypes.UNVISITED || nodes[leftName].type === NodeTypes.UNVISITED)
   if (isBottomLeft && nodes[bottomLeftName].type === NodeTypes.UNVISITED)
     neighbors.push({ position: nodes[bottomLeftName].position, parent: startNode })
 
