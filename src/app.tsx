@@ -4,14 +4,14 @@ import Legend from './components/legend'
 import Board from './components/board'
 import Dijkstra from './core/dijkstra'
 import Timer from './core/timer'
-import { defaultSettings, defaultBoardMouseEvents, AlgorithmInterval } from './core/settings'
-import { Empty, Settings, NodeTypes, Dictionary, NodeParams, BoardMouseEvents, Vector } from './core/types'
+import { defaultSettings, defaultBoardEvents, AlgorithmInterval } from './core/settings'
+import { Empty, Settings, NodeTypes, Dictionary, NodeParams, BoardEvents, Vector } from './core/types'
 import { getMaxRows, getMaxColumns, getNodeStartPosition, getNodeEndPosition } from './core/functions'
 
 const App: React.FunctionComponent<Empty> = () => {
   const [settings, setSettings] = React.useState<Settings>(defaultSettings)
   const [nodes, setNodes] = React.useState<Dictionary<NodeParams>>({})
-  const [boardMouseEvents, setBoardMouseEvents] = React.useState<BoardMouseEvents>(defaultBoardMouseEvents)
+  const [boardEvents, setBoardEvents] = React.useState<BoardEvents>(defaultBoardEvents)
   const [animationTimers, setAnimationTimers] = React.useState<Array<Timer>>([])
 
   React.useEffect((): () => void => {
@@ -54,6 +54,18 @@ const App: React.FunctionComponent<Empty> = () => {
     return onPause()
   }, [settings.isPaused])
 
+  React.useEffect((): void => {
+    if (!settings.isFinished)
+      return undefined
+    const newNodes = clearVisitedAndPathNodes()
+    const [nodeParams, path] = Dijkstra(newNodes, settings.rows, settings.columns, settings.startNode, settings.endNode)
+    for (let i = 0, l = nodeParams.length; i < l; ++i)
+      newNodes[`${nodeParams[i].position.x}-${nodeParams[i].position.y}`].type = nodeParams[i].type
+    for (let i = 0, l = path.length; i < l; ++i)
+      newNodes[`${path[i].position.x}-${path[i].position.y}`].type = path[i].type
+    setNodes(newNodes)
+  }, [settings.startNode, settings.endNode])
+
   const onResize = (): void => {
     const maxRows = getMaxRows()
     const maxColumns = getMaxColumns()
@@ -69,9 +81,10 @@ const App: React.FunctionComponent<Empty> = () => {
       timers.push(new Timer(() => changeNodeType(nodeParams[i].position, nodeParams[i].type), playTime * i))
     for (let i = 0, l = path.length; i < l; ++i)
       timers.push(new Timer(() => changeNodeType(path[i].position, path[i].type), playTime * (nodeParams.length + i)))
-    timers.push(new Timer(() => onChange('isPlaying', false), playTime * (nodeParams.length + path.length)))
+    timers.push(new Timer(() => setSettings(prevState => ({ ...prevState, isPlaying: false })), playTime * (nodeParams.length + path.length)))
     setNodes(newNodes)
     setAnimationTimers(timers)
+    setSettings(prevState => ({ ...prevState, isFinished: true }))
   }
 
   const onPause = (): void => {
@@ -91,14 +104,14 @@ const App: React.FunctionComponent<Empty> = () => {
         newNodes[`${x}-${y}`] = { type: NodeTypes.UNVISITED, position: { x, y } }
     setNodes(newNodes)
     clearAnimationTimers()
-    setSettings(prevState => ({ ...prevState, isPlaying: false, isPaused: false }))
+    setSettings(prevState => ({ ...prevState, isPlaying: false, isPaused: false, isFinished: false }))
   }
 
   const onChange = (name: keyof Settings, value: Settings[keyof Settings]): void => setSettings({ ...settings, [name]: value })
-  const onMouseUp = (): void => setBoardMouseEvents(prevState => ({ ...prevState, ...defaultBoardMouseEvents }))
-  const onMouseDown = (): void => setBoardMouseEvents(prevState => ({ ...prevState, isMouseDown: true }))
-  const onStartNode = (): void => setBoardMouseEvents(prevState => ({ ...prevState, isNodeStartDown: true }))
-  const onEndNode = (): void => setBoardMouseEvents(prevState => ({ ...prevState, isNodeEndDown: true }))
+  const onMouseUp = (): void => setBoardEvents(prevState => ({ ...prevState, ...defaultBoardEvents }))
+  const onMouseDown = (): void => setBoardEvents(prevState => ({ ...prevState, isMouseDown: true }))
+  const onStartNode = (): void => setBoardEvents(prevState => ({ ...prevState, isNodeStartDown: true }))
+  const onEndNode = (): void => setBoardEvents(prevState => ({ ...prevState, isNodeEndDown: true }))
 
   const onNodeDown = (position: Vector): void => {
     if (settings.isPlaying)
@@ -112,15 +125,15 @@ const App: React.FunctionComponent<Empty> = () => {
   }
 
   const onNodeOver = (position: Vector): void => {
-    if (!boardMouseEvents.isMouseDown || settings.isPlaying)
+    if (!boardEvents.isMouseDown || settings.isPlaying)
       return undefined
     const name = `${position.x}-${position.y}`
     const type = nodes[name].type
-    if ((boardMouseEvents.isNodeStartDown  || boardMouseEvents.isNodeEndDown) && type === NodeTypes.WALL)
+    if ((boardEvents.isNodeStartDown  || boardEvents.isNodeEndDown) && type === NodeTypes.WALL)
       return undefined
-    if (boardMouseEvents.isNodeStartDown && type !== NodeTypes.WALL)
+    if (boardEvents.isNodeStartDown && type !== NodeTypes.WALL)
       return onChange('startNode', position)
-    if (boardMouseEvents.isNodeEndDown && type !== NodeTypes.WALL)
+    if (boardEvents.isNodeEndDown && type !== NodeTypes.WALL)
       return onChange('endNode', position)
     if (type === NodeTypes.UNVISITED)
       return changeNodeType(position, NodeTypes.WALL)

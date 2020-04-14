@@ -10,7 +10,7 @@ export type Empty =
 export type Dictionary<T> = { [name: string]: T }
 
 /** The board mouse events. */
-export interface BoardMouseEvents {
+export interface BoardEvents {
   /** Returns true if mouse is down. */
   isMouseDown: boolean
   /** Returns true if mouse is down on start node. */
@@ -83,6 +83,8 @@ export interface Settings {
   isPlaying: boolean
   /** Return true if visualisation is paused. */
   isPaused: boolean
+  /** Return true if visualisation is finished. */
+  isFinished: boolean
   /** The algorithm name. */
   algorithm: Algorithms
 }

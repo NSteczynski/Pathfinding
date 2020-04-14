@@ -1,3 +1,4 @@
+/** Responsible for launch callback on timeout and handle pause and resume options. */
 export default class Timer {
   private _start: number
   private _remainingTime: number

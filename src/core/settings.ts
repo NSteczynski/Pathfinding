@@ -1,4 +1,4 @@
-import { Settings, Algorithms, BoardMouseEvents } from "./types"
+import { Settings, Algorithms, BoardEvents } from "./types"
 import { getMaxRows, getMaxColumns, getNodeStartPosition, getNodeEndPosition } from "./functions"
 
 const maxRows = getMaxRows()
@@ -17,6 +17,7 @@ export const defaultSettings: Settings = {
   playingSpeed: 1.0,
   isPlaying: false,
   isPaused: false,
+  isFinished: false,
   algorithm: Algorithms.DIJKSTRA
 }
 
@@ -24,7 +25,7 @@ export const defaultSettings: Settings = {
 export const AlgorithmInterval = 100
 
 /** The default board mouse events. */
-export const defaultBoardMouseEvents: BoardMouseEvents = {
+export const defaultBoardEvents: BoardEvents = {
   isMouseDown: false,
   isNodeStartDown: false,
   isNodeEndDown: false
