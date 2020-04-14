@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "App for displaying pathfinding algorithms.",
   "author": "Norbert Steczyński",
-  "license": "ISC",
+  "license": "MIT",
   "scripts": {
     "start": "webpack-dev-server --watch",
     "build": "webpack --production"
