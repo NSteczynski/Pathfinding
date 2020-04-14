@@ -89,19 +89,34 @@ export interface Settings {
   algorithm: Algorithms
 }
 
-/** The dijkstra nodes parameters. */
-export interface DijkstraParams {
+/** The algorithm nodes parameters. */
+export interface AlgorithmParams {
   /** The node position. */
   position: Vector
+  /** The node parent. */
+  parent?: this
+}
+
+/** The dijkstra nodes parameters. */
+export interface DijkstraParams extends AlgorithmParams {
   /** The node distance from start. */
   distance: number
-  /** The node parent. */
-  parent?: DijkstraParams
+}
+
+/** The A* nodes parameters. */
+export interface AstarParams extends AlgorithmParams {
+  /** The node total cost. */
+  cost: number
+  /** The node distance from start. */
+  distance: number
+  /** The distance from node to end node. */
+  heuristic: number
 }
 
 /** The list of algorithms. */
 export enum Algorithms {
-  DIJKSTRA = 'dijkstra'
+  DIJKSTRA = 'Dijkstra',
+  ASTAR = 'A*'
 }
 
 /** The list of node types. */

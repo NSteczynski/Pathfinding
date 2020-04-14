@@ -1,4 +1,5 @@
 # Pathfinding App
-**Live** https://nsteczynski.github.io/Pathfinding/
-## Current implemented pathfinding algorithms
-- **Dijkstra Algorithm**
+### **Live** https://nsteczynski.github.io/Pathfinding/
+### Current implemented pathfinding algorithms
+- Dijkstra Algorithm
+- A* (Euclidean) Algorithm

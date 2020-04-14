@@ -3,10 +3,16 @@ import Header from './components/header'
 import Legend from './components/legend'
 import Board from './components/board'
 import Dijkstra from './core/dijkstra'
+import Astar from './core/astar'
 import Timer from './core/timer'
 import { defaultSettings, defaultBoardEvents, AlgorithmInterval } from './core/settings'
-import { Empty, Settings, NodeTypes, Dictionary, NodeParams, BoardEvents, Vector } from './core/types'
+import { Empty, Settings, NodeTypes, Dictionary, NodeParams, BoardEvents, Vector, Algorithms } from './core/types'
 import { getMaxRows, getMaxColumns, getNodeStartPosition, getNodeEndPosition } from './core/functions'
+
+const AlgorithmList: Dictionary<(nodes: Dictionary<NodeParams>, rows: number, columns: number, startNode: Vector, endNode: Vector) => [NodeParams[], NodeParams[]]> = {
+  [Algorithms.DIJKSTRA]: Dijkstra,
+  [Algorithms.ASTAR]: Astar
+}
 
 const App: React.FunctionComponent<Empty> = () => {
   const [settings, setSettings] = React.useState<Settings>(defaultSettings)
@@ -58,7 +64,8 @@ const App: React.FunctionComponent<Empty> = () => {
     if (!settings.isFinished)
       return undefined
     const newNodes = clearVisitedAndPathNodes()
-    const [nodeParams, path] = Dijkstra(newNodes, settings.rows, settings.columns, settings.startNode, settings.endNode)
+    const Algorithm = AlgorithmList[settings.algorithm]
+    const [nodeParams, path] = Algorithm(newNodes, settings.rows, settings.columns, settings.startNode, settings.endNode)
     for (let i = 0, l = nodeParams.length; i < l; ++i)
       newNodes[`${nodeParams[i].position.x}-${nodeParams[i].position.y}`].type = nodeParams[i].type
     for (let i = 0, l = path.length; i < l; ++i)
@@ -74,7 +81,8 @@ const App: React.FunctionComponent<Empty> = () => {
 
   const onPlay = (): void => {
     const newNodes = clearVisitedAndPathNodes()
-    const [nodeParams, path] = Dijkstra(newNodes, settings.rows, settings.columns, settings.startNode, settings.endNode)
+    const Algorithm = AlgorithmList[settings.algorithm]
+    const [nodeParams, path] = Algorithm(newNodes, settings.rows, settings.columns, settings.startNode, settings.endNode)
     const playTime = AlgorithmInterval / settings.playingSpeed
     const timers: Array<Timer> = []
     for (let i = 0, l = nodeParams.length; i < l; ++i)
